@@ -29,6 +29,22 @@ require_once("connection.php");
                 font-size: 10vh;
                 color: var(--dark-bg);
             }
+            table {
+                border: 1px solid; border-radius: 10px;
+                width: 100%; padding: 20px; border-spacing: 2vw 5px;
+            }
+            th {
+                border-bottom: 1px solid var(--dark-bg);
+                height: 4vh;
+                vertical-align: center;
+            }
+            td {
+                text-align: center; vertical-align: center;
+                padding: 2px;
+            }
+            tr:hover {
+                background-color: var(--dark-bg);
+            }
             html { color-scheme: light dark; }
             body { width: 35em; margin: 0 auto; color: black; vertical-align: center;
                 font-family: Tahoma, Verdana, Arial, sans-serif; }
@@ -43,17 +59,24 @@ require_once("connection.php");
                 background-color: rgba(255,255,255,0.5);
             }
             #main {
-                position: absolute; top: 0px; left: 0px; z-index: -1;
-                height: 100%;
+                /*position: absolute; top: 0px; left: 0px; z-index: -1;
+                height: 100%;*/
+                position: absolute; top: 16%; left: 0px; z-index: -1;
                 width: 100%;
                 background-color: var(--bg);
             }
             #main .block {
                 position: relative; top:16%; left: 5%;
-                height: 80%; width: 90%;
+                /*height: 20%;*/ width: 90%;
                 display: flex;
-                flex-direction: column;
+                flex-direction: row; flex-wrap: wrap;
+                gap: 16px;
                 align-items: center; justify-content: center;
+            }
+            .element {
+                flex: 1 1 calc(12.5% - 16px); /* Adjusts to 3 columns */
+                min-width: 50px; /* Ensures a minimum size */
+                text-align: center;
             }
             #term {
                 display: flex;
@@ -145,12 +168,17 @@ require_once("connection.php");
                 }
                 else {
                     $vol = test_input($_POST['vol']);
+                    // Call the python file to crawl for the word.
                     $res = null;
                     $status = null;
                     exec(escapeshellcmd("/usr/share/nginx/py/.venv/bin/python3 /usr/share/nginx/py/web_crawling.py $vol"), $res, $status);
                     if($status == 0) {
-                        print_r($res);
-                        echo "happy";
+                        $res = json_decode(implode("", $res)); // Turn into object
+                        if($res === null) {
+                            http_response_code(500);
+                            die('Internal Server Error: Format error in scrawling result.');
+                        }
+                        #print_r($res);
                     }
                     else {
                         echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">Volcabulary Not Found!!</h1></div>\n";
@@ -158,6 +186,86 @@ require_once("connection.php");
                 }
             }
             ?>
+            <div class="block" id="pronounciation">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Part of Speech</th>
+                            <th scope="col">Pronounciation(UK)</th>
+                            <th scope="col">Pronounciation(US)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach($res->Pronounciation as $entry) {
+                            echo "<tr>\n";
+                            foreach($entry as $td) {
+                                echo "<td>{$td}</td>\n";
+                            }
+                            echo "</tr>\n";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+            <div class="block" id="translate">
+                <table>
+                    <thead>
+                        <th scope="col">Chinese</th>
+                        <th scope="col">Usage</th>
+                        <th scope="col">English</th>
+                        <th scope="col">Example</th>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach($res->Entries as $entry) {
+                            $usage = implode("; ", array_map(fn($element)=> is_array($element)?end($element):$element, $entry->Usage)); // Implode the result, which is the element itself or the last element of the array.
+                            $example = implode("<br>\n", $entry->Example);
+                            echo <<<RESULT
+                            <tr>
+                                <td>{$entry->Term}</td>
+                                <td>{$usage}</td>
+                                <td>{$entry->Definition}</td>
+                                <td>{$example}</td>
+                            </tr>
+                            RESULT;
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+            <div class="block" id="example">
+                <table>
+                    <thead>
+                        <th scope="col">Usage</th>
+                        <th scope="col">Sentence</th>
+                    </thead>
+                    <tbody>
+                    <?php
+                    foreach($res->Examples as $entry) {
+                        $example = implode("<br>\n", $entry[1]);
+                        echo <<<RESULT
+                        <tr>
+                            <td>{$entry[0]}</td>
+                            <td>{$example}</td>
+                        <tr>
+                        RESULT;
+                    }
+                    ?>
+                    </tbody>
+                </table>
+            </div>
+            <div class="block" id="extension">
+                <?php
+                foreach($res->extend as $entry) {
+                    echo <<<RESULT
+                    <div class="element">
+                        <p>$entry</p>
+                    </div>
+                    RESULT;
+                }
+                ?>
+            </div>
         </div>
     </body>
 </html>
