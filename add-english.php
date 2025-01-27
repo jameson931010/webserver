@@ -5,12 +5,9 @@ require_once("connection.php");
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Home Page</title>
+        <title>Accounting</title>
         <script src="https://kit.fontawesome.com/a211388c46.js" crossorigin="anonymous"></script>
         <!--
-        <link href="../asset/css/fontawesome.css" rel="stylesheet" />
-        <link href="../asset/css/brands.css" rel="stylesheet" />
-        <link href="../asset/css/solid.css" rel="stylesheet" />
         -->
         <style>
             :root{
@@ -30,10 +27,7 @@ require_once("connection.php");
             }
             i {
                 font-size: 10vh;
-            }
-            a {
-                text-decoration: none;
-                color: black;
+                color: var(--dark-bg);
             }
             html { color-scheme: light dark; }
             body { width: 35em; margin: 0 auto; color: black; vertical-align: center;
@@ -42,7 +36,7 @@ require_once("connection.php");
                 position: fixed; top: 0px; left: 0px;
 
                 float: right;
-                display: grid; grid-template-columns: 4fr minmax(50px, 1fr) minmax(50px, 1fr);
+                display: grid; grid-template-columns: minmax(30px, 1fr) minmax(30px, 1fr) 6fr minmax(50px, 1fr);
                 height: 10%;
                 width: 100%;
                 border-radius: 5%;
@@ -54,6 +48,21 @@ require_once("connection.php");
                 width: 100%;
                 background-color: var(--bg);
             }
+            #main .block {
+                position: relative; top:16%; left: 5%;
+                height: 80%; width: 90%;
+                display: flex;
+                flex-direction: column;
+                align-items: center; justify-content: center;
+            }
+            #term {
+                display: flex;
+                flex-direction: column; flex-wrap: wrap;
+                align-items: center; justify-content: center;
+            }
+            label, input, select {
+                font-size: 3vw;
+            }
             #header .block {
                 display: flex; justify-content: center; align-items: center;
             }
@@ -63,18 +72,6 @@ require_once("connection.php");
                 padding-left: 30px; padding-right: 30px;
                 height: 60%;
             }
-            #main .block {
-                display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
-                grid-gap: 8% 5%;
-                position: relative; top: 16%; left: 5%;
-                height: 80%; width: 90%;
-            }
-            #main .item {
-                height: 100%; width: 100%;
-                display: flex;
-                align-items: center; justify-content: center;
-            }
-
             #p_account, #account {
                 background-color: var(--account);
             }
@@ -92,10 +89,28 @@ require_once("connection.php");
                 color: white;
                 border-radius: 50%;
             }
+            #warning {
+                display: flex;
+                align-items: center; justify-content: center;
+            }
         </style>
     </head>
     <body>
         <div class="session" id="header">
+            <div class="block" id="home">
+                <a href="index.php">
+                    <div class="item" id="home-button">
+                        <p><i class="fa-solid fa-house"></i></p>
+                    </div>
+                </a>
+            </div>
+            <div class="block" id="home-account">
+                <a href="home-account.php">
+                    <div class="item" id="account-button">
+                        <p><i class="fa-solid fa-clipboard-list"></i></p>
+                    </div>
+                </a>
+            </div>
             <div class="block" id="progress">
                 <div class="item" id="p_account" style="order: 1">
                     <p>days no account</p>
@@ -114,31 +129,35 @@ require_once("connection.php");
                 <p><?php echo date("m/d (D) H:i")?></p>
                 <!--<p><?php echo date("m/d (D) H:i:s")?></p>-->
             </div>
-            <div class="block" id="login">
-                <div class="item" id="login-button">
-                    <p><b>Log in&nbsp;&nbsp;</b><i class="fa-solid fa-circle-user" style="font-size: 18px;"></i></p>
-                </div>
-            </div>
         </div>
         <div class="session" id="main">
-            <div class="block" id="task">
-                <a href="add-account.php">
-                    <div class="item" id="account">
-                        <p><i class="fa-solid fa-file-invoice-dollar"></i></p>
-                    </div>
-                </a>
-                <div class="item" id="diary">
-                    <h1><i class="fa-solid fa-book"></i></h1>
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="block" id="list">
+                <div class="item" id="search">
+                    <label for="vol">New word</label>
+                    <input type="text" name="vol" id="vol">
+                    <input type="submit">
                 </div>
-                <a href="add-english.php">
-                    <div class="item" id="english">
-                        <h1><i class="fa-solid fa-a"></i><i class="fa-solid fa-b"></i><i class="fa-solid fa-c"></i></h1>
-                    </div>
-                </a>
-                <div class="item" id="time">
-                    <h1><i class="fa-solid fa-calendar-days"></i><h1/>
-                </div>
-            </div>
+            </form>
+            <?php
+            if($_SERVER["REQUEST_METHOD"] === "POST") {
+                if(empty($_POST['vol'])) {
+                    echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">Fill all blanks!!</h1></div>\n";
+                }
+                else {
+                    $vol = test_input($_POST['vol']);
+                    $res = null;
+                    $status = null;
+                    exec(escapeshellcmd("/usr/share/nginx/py/.venv/bin/python3 /usr/share/nginx/py/web_crawling.py $vol"), $res, $status);
+                    if($status == 0) {
+                        print_r($res);
+                        echo "happy";
+                    }
+                    else {
+                        echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">Volcabulary Not Found!!</h1></div>\n";
+                    }
+                }
+            }
+            ?>
         </div>
     </body>
 </html>

@@ -9,8 +9,8 @@ headers = {'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.go
 web_request = requests.get(url, headers=headers)
 #web_request = requests.get(url)
 res = bs4.BeautifulSoup(web_request.text, "html.parser")
-with open('out.html', 'w') as f:
-   print(res.prettify(), file=f)    # Python 3.x
+#with open('out.html', 'w') as f:
+#   print(res.prettify(), file=f)    # Python 3.x
 soup = res.find('div', "di-body")   # The main part of definition
 if(type(soup)==type(None)):
     print("No result")

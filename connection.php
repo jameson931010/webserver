@@ -1,5 +1,6 @@
 <?php
     declare(strict_types=1);
+    // Load password
     $file = fopen("/etc/nginx/password", 'r');
     if($file) {
         $PW = fgets($file);
@@ -16,6 +17,7 @@
         http_response_code(500);
         die('Internal Server Error: Unable to open the required file.');
     }
+    // Connect with database
     $conn = mysqli_connect("localhost", "jaime", $PW, "jaime");
     if(!$conn) {
         http_response_code(500);
