@@ -62,7 +62,7 @@ require_once("connection.php");
                 /*position: absolute; top: 0px; left: 0px; z-index: -1;
                 height: 100%;*/
                 position: absolute; top: 16%; left: 0px; z-index: -1;
-                width: 100%;
+                min-height: 100%; width: 100%;
                 background-color: var(--bg);
             }
             #main .block {
@@ -168,20 +168,27 @@ require_once("connection.php");
                 }
                 else {
                     $vol = test_input($_POST['vol']);
-                    // Call the python file to crawl for the word.
+                    $result = sql_query("SELECT content FROM english WHERE vocabulary=\"$vol\"");
                     $res = null;
-                    $status = null;
-                    exec(escapeshellcmd("/usr/share/nginx/py/.venv/bin/python3 /usr/share/nginx/py/web_crawling.py $vol"), $res, $status);
-                    if($status == 0) {
-                        $res = json_decode(implode("", $res)); // Turn into object
-                        if($res === null) {
-                            http_response_code(500);
-                            die('Internal Server Error: Format error in scrawling result.');
-                        }
-                        #print_r($res);
+                    if(mysqli_num_rows($result) > 0) {
+                        $res = json_decode(mysqli_fetch_array($result, MYSQLI_ASSOC)['content']);
+                        #echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">$res</h1></div>\n";
                     }
                     else {
-                        echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">Volcabulary Not Found!!</h1></div>\n";
+                        // Call the python file to crawl for the word.
+                        $status = null;
+                        exec(escapeshellcmd("/usr/share/nginx/py/.venv/bin/python3 /usr/share/nginx/py/web_crawling.py $vol"), $res, $status);
+                        if($status == 0) {
+                            $res = json_decode(implode("", $res)); // Turn into object
+                            if($res === null) {
+                                http_response_code(500);
+                                die('Internal Server Error: Format error in scrawling result.');
+                            }
+                            #print_r($res);
+                        }
+                        else {
+                            echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">Volcabulary Not Found!!</h1></div>\n";
+                        }
                     }
                 }
             }
@@ -197,6 +204,7 @@ require_once("connection.php");
                     </thead>
                     <tbody>
                         <?php
+                        #print_r($res);
                         foreach($res->Pronounciation as $entry) {
                             echo "<tr>\n";
                             foreach($entry as $td) {
