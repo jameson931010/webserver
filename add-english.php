@@ -6,9 +6,8 @@ require_once("connection.php");
     <head>
         <meta charset="UTF-8">
         <title>Accounting</title>
-        <script src="https://kit.fontawesome.com/a211388c46.js" crossorigin="anonymous"></script>
-        <!--
-        -->
+        <script src="modification.js" async></script>
+        <script src="https://kit.fontawesome.com/a211388c46.js" crossorigin="anonymous" defer></script>
         <style>
             :root{
                 --account: #FDEEB6;
@@ -45,6 +44,22 @@ require_once("connection.php");
             tr:hover {
                 background-color: var(--dark-bg);
             }
+            table i {
+                font-size: 20px;
+                color: red;
+            }
+            button {
+                background-color: var(--bg);
+                margin: 16px;
+                border: none; border-radius: 5px;
+            }
+            button:hover {
+                background-color: var(--dark-bg);
+            }
+            button:active {
+                background-color: var(--bg);
+            }
+
             html { color-scheme: light dark; }
             body { width: 35em; margin: 0 auto; color: black; vertical-align: center;
                 font-family: Tahoma, Verdana, Arial, sans-serif; }
@@ -184,16 +199,28 @@ require_once("connection.php");
                                 http_response_code(500);
                                 die('Internal Server Error: Format error in scrawling result.');
                             }
-                            #print_r($res);
+                            //print_r($res);
+                            //$res = json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_QUOT | JSON_HEX_APOS);
+                            $t = json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                            $dum = 1;
+                            $mod->bind_param("sis", $vol, $dum, $t);
+                            $mod->execute();
+                            $mod->close();
+                            #$res = addslashes(json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_QUOT | JSON_HEX_APOS));
+                            #echo($res);
+                            #sql_query("INSERT INTO english (vocabulary, source_id, content) VALUES (\"$vol\", 1, \'$res\';");
                         }
                         else {
-                            echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">Volcabulary Not Found!!</h1></div>\n";
+                            echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">Vocabulary Not Found!!</h1></div>\n";
                         }
                     }
                 }
             }
             ?>
-            <div class="block" id="pronounciation">
+            <div class="block" id="Vocabulary">
+                <h1 id="vocabulary"><?php echo $vol?></h1>
+            </div>
+            <div class="block" id="Pronounciations">
                 <table>
                     <thead>
                         <tr>
@@ -205,18 +232,21 @@ require_once("connection.php");
                     <tbody>
                         <?php
                         #print_r($res);
-                        foreach($res->Pronounciation as $entry) {
-                            echo "<tr>\n";
+                        $cnt = 0;
+                        foreach($res->Pronounciations as $entry) {
+                            echo "<tr id=\"pronounciation_$cnt\">\n";
                             foreach($entry as $td) {
                                 echo "<td>{$td}</td>\n";
                             }
+                            echo "<td><button onclick=\"remove(this)\"><i class=\"fa-solid fa-circle-xmark\"></i></button></td>\n";
                             echo "</tr>\n";
+                            $cnt++;
                         }
                         ?>
                     </tbody>
                 </table>
             </div>
-            <div class="block" id="translate">
+            <div class="block" id="Translates">
                 <table>
                     <thead>
                         <th scope="col">Chinese</th>
@@ -226,14 +256,14 @@ require_once("connection.php");
                     </thead>
                     <tbody>
                         <?php
-                        foreach($res->Entries as $entry) {
+                        foreach($res->Translates as $entry) {
                             $usage = implode("; ", array_map(fn($element)=> is_array($element)?end($element):$element, $entry->Usage)); // Implode the result, which is the element itself or the last element of the array.
                             $example = implode("<br>\n", $entry->Example);
                             echo <<<RESULT
                             <tr>
-                                <td>{$entry->Term}</td>
+                                <td>{$entry->Chinese}</td>
                                 <td>{$usage}</td>
-                                <td>{$entry->Definition}</td>
+                                <td>{$entry->English}</td>
                                 <td>{$example}</td>
                             </tr>
                             RESULT;
@@ -242,7 +272,7 @@ require_once("connection.php");
                     </tbody>
                 </table>
             </div>
-            <div class="block" id="example">
+            <div class="block" id="Examples">
                 <table>
                     <thead>
                         <th scope="col">Usage</th>
@@ -263,9 +293,9 @@ require_once("connection.php");
                     </tbody>
                 </table>
             </div>
-            <div class="block" id="extension">
+            <div class="block" id="Extensions">
                 <?php
-                foreach($res->extend as $entry) {
+                foreach($res->Extensions as $entry) {
                     echo <<<RESULT
                     <div class="element">
                         <p>$entry</p>

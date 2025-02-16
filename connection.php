@@ -40,4 +40,10 @@
         $data = htmlspecialchars($data); # strip_tags($dara) completely remove PHP and HTML tags.
         return $data;
     }
+
+    $test = new mysqli("localhost", "jaime", $PW, "jaime");
+    if($test->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    $mod = $test->prepare("INSERT INTO english (vocabulary, source_id, content) VALUES (?, ?, ?)");
 ?>

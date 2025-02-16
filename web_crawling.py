@@ -56,7 +56,7 @@ for sen in soup.find_all('div', ["def-body", "ddef_h", "phrase-head"]):
                     use = ""
 
         definition.append({\
-            "Term": cdef, "Definition": edef, "Example": example.copy(), "Usage": usage.copy()})
+            "Chinese": cdef, "English": edef, "Example": example.copy(), "Usage": usage.copy()})
         edef = cdef = None
         example.clear()
         usage.clear()
@@ -80,5 +80,5 @@ extend = list()                     # Extending applications
 for word in soup.find_all('span', ["inf-group", "x-h", "x-p"]):
     extend.append(word.get_text())
 
-ans = {"Pronounciation": pronounciation, "Entries": definition, "Examples": more_example, "extend": extend}
+ans = {"Pronounciations": pronounciation, "Translates": definition, "Examples": more_example, "Extensions": extend}
 print(json.dumps(ans, indent=4, ensure_ascii=False))
