@@ -1,5 +1,6 @@
 <?php
 require_once("connection.php");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 ?>
 <!DOCTYPE html>
 <html>
@@ -7,6 +8,7 @@ require_once("connection.php");
         <meta charset="UTF-8">
         <title>Accounting</title>
         <script src="modification.js" async></script>
+        <script src="extend.js" async></script>
         <script src="https://kit.fontawesome.com/a211388c46.js" crossorigin="anonymous" defer></script>
         <style>
             :root{
@@ -148,7 +150,7 @@ require_once("connection.php");
                 </a>
             </div>
             <div class="block" id="home-account">
-                <a href="home-account.php">
+                <a href="home-english.php">
                     <div class="item" id="account-button">
                         <p><i class="fa-solid fa-clipboard-list"></i></p>
                     </div>
@@ -182,12 +184,12 @@ require_once("connection.php");
                 </div>
             </form>
             <?php
-            if($_SERVER["REQUEST_METHOD"] === "POST") {
-                if(empty($_POST['vol'])) {
-                    echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">Fill all blanks!!</h1></div>\n";
+            //if($_SERVER["REQUEST_METHOD"] === "POST") {
+                if(empty($_REQUEST['vol'])) {
+                    if($_SERVER["REQUEST_METHOD"] === "POST") echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">Fill all blanks!!</h1></div>\n";
                 }
                 else {
-                    $vol = test_input($_POST['vol']);
+                    $vol = test_input($_REQUEST['vol']);
                     $result = sql_query("SELECT content FROM english WHERE vocabulary=\"$vol\"");
                     $res = null;
                     if(mysqli_num_rows($result) > 0) {
@@ -219,7 +221,7 @@ require_once("connection.php");
                         }
                     }
                 }
-            }
+            //}
             ?>
             <div class="block" id="Vocabulary">
                 <h1 id="vocabulary"><?php echo $vol?></h1>
@@ -316,7 +318,7 @@ require_once("connection.php");
                     foreach($res->Extensions as $entry) {
                         echo <<<RESULT
                         <div class="element" id="Extensions_{$cnt}">
-                            <p>$entry</p>
+                            <button onclick="lookup(this)">$entry</button>
                             <button onclick="remove(this)"><i class="fa-solid fa-circle-xmark"></i></button>
                         </div>
                         RESULT;
