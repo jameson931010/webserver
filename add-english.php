@@ -91,7 +91,12 @@ require_once("connection.php");
             .element {
                 flex: 1 1 calc(12.5% - 16px); /* Adjusts to 3 columns */
                 min-width: 50px; /* Ensures a minimum size */
-                text-align: center;
+                display: flex; flex-direction: row;
+                text-align: center; justify-content: center;
+            }
+            .element i {
+                font-size: 20px;
+                color: red;
             }
             #term {
                 display: flex;
@@ -187,7 +192,6 @@ require_once("connection.php");
                     $res = null;
                     if(mysqli_num_rows($result) > 0) {
                         $res = json_decode(mysqli_fetch_array($result, MYSQLI_ASSOC)['content']);
-                        #echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">$res</h1></div>\n";
                     }
                     else {
                         // Call the python file to crawl for the word.
@@ -231,16 +235,18 @@ require_once("connection.php");
                     </thead>
                     <tbody>
                         <?php
-                        #print_r($res);
-                        $cnt = 0;
-                        foreach($res->Pronounciations as $entry) {
-                            echo "<tr id=\"pronounciation_$cnt\">\n";
-                            foreach($entry as $td) {
-                                echo "<td>{$td}</td>\n";
+                        if($res->Pronounciations !== null) {
+                            //print_r($res);
+                            $cnt = 0;
+                            foreach($res->Pronounciations as $entry) {
+                                echo "<tr id=\"Pronounciations_$cnt\">\n";
+                                foreach($entry as $td) {
+                                    echo "<td>{$td}</td>\n";
+                                }
+                                echo "<td><button onclick=\"remove(this)\"><i class=\"fa-solid fa-circle-xmark\"></i></button></td>\n";
+                                echo "</tr>\n";
+                                $cnt++;
                             }
-                            echo "<td><button onclick=\"remove(this)\"><i class=\"fa-solid fa-circle-xmark\"></i></button></td>\n";
-                            echo "</tr>\n";
-                            $cnt++;
                         }
                         ?>
                     </tbody>
@@ -256,17 +262,22 @@ require_once("connection.php");
                     </thead>
                     <tbody>
                         <?php
-                        foreach($res->Translates as $entry) {
-                            $usage = implode("; ", array_map(fn($element)=> is_array($element)?end($element):$element, $entry->Usage)); // Implode the result, which is the element itself or the last element of the array.
-                            $example = implode("<br>\n", $entry->Example);
-                            echo <<<RESULT
-                            <tr>
-                                <td>{$entry->Chinese}</td>
-                                <td>{$usage}</td>
-                                <td>{$entry->English}</td>
-                                <td>{$example}</td>
-                            </tr>
-                            RESULT;
+                        if($res->Translates !== null) {
+                            $cnt = 0;
+                            foreach($res->Translates as $entry) {
+                                $usage = implode("; ", array_map(fn($element)=> is_array($element)?end($element):$element, $entry->Usage)); // Implode the result, which is the element itself or the last element of the array.
+                                $example = implode("<br>\n", $entry->Example);
+                                echo <<<RESULT
+                                <tr id=Translates_{$cnt}>
+                                    <td>{$entry->Chinese}</td>
+                                    <td>{$usage}</td>
+                                    <td>{$entry->English}</td>
+                                    <td>{$example}</td>
+                                    <td><button onclick="remove(this)"><i class="fa-solid fa-circle-xmark"></i></button></td>
+                                </tr>
+                                RESULT;
+                                $cnt++;
+                            }
                         }
                         ?>
                     </tbody>
@@ -280,14 +291,19 @@ require_once("connection.php");
                     </thead>
                     <tbody>
                     <?php
-                    foreach($res->Examples as $entry) {
-                        $example = implode("<br>\n", $entry[1]);
-                        echo <<<RESULT
-                        <tr>
-                            <td>{$entry[0]}</td>
-                            <td>{$example}</td>
-                        <tr>
-                        RESULT;
+                    if($res->Examples !== null) {
+                        $cnt = 0;
+                        foreach($res->Examples as $entry) {
+                            $example = implode("<br>\n", $entry[1]);
+                            echo <<<RESULT
+                            <tr id=Examples_{$cnt}>
+                                <td>{$entry[0]}</td>
+                                <td>{$example}</td>
+                                <td><button onclick="remove(this)"><i class="fa-solid fa-circle-xmark"></i></button></td>
+                            <tr>
+                            RESULT;
+                            $cnt++;
+                        }
                     }
                     ?>
                     </tbody>
@@ -295,12 +311,17 @@ require_once("connection.php");
             </div>
             <div class="block" id="Extensions">
                 <?php
-                foreach($res->Extensions as $entry) {
-                    echo <<<RESULT
-                    <div class="element">
-                        <p>$entry</p>
-                    </div>
-                    RESULT;
+                if($res->Extensions !== null) {
+                    $cnt = 0;
+                    foreach($res->Extensions as $entry) {
+                        echo <<<RESULT
+                        <div class="element" id="Extensions_{$cnt}">
+                            <p>$entry</p>
+                            <button onclick="remove(this)"><i class="fa-solid fa-circle-xmark"></i></button>
+                        </div>
+                        RESULT;
+                        $cnt++;
+                    }
                 }
                 ?>
             </div>

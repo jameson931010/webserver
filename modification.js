@@ -1,5 +1,6 @@
 function remove(entry) {
     let row = entry.closest("tr");
+    if(row === null) row = entry.closest("div");   
     let id=row.id.split("_");
     row.remove();
 
