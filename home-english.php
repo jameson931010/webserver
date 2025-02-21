@@ -123,7 +123,7 @@ require_once("connection.php");
             }
             #list {
                 height: 100%; width: 100%;
-                display: flex;
+                display: flex; flex-wrap: wrap;
                 align-items: center; justify-content: center;
             }
         </style>

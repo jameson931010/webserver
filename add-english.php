@@ -46,7 +46,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
             tr:hover {
                 background-color: var(--dark-bg);
             }
-            table i {
+            button i {
                 font-size: 20px;
                 color: red;
             }
@@ -225,6 +225,8 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
             ?>
             <div class="block" id="Vocabulary">
                 <h1 id="vocabulary"><?php echo $vol?></h1>
+                
+                <button onclick="remove(this)"><i class="fa-solid fa-circle-xmark"></i></button>
             </div>
             <div class="block" id="Pronounciations">
                 <table>
