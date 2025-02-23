@@ -100,6 +100,9 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                 font-size: 20px;
                 color: red;
             }
+            .highlight {
+                font-weight: bold;
+            }
             #term {
                 display: flex;
                 flex-direction: column; flex-wrap: wrap;
@@ -275,6 +278,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                             foreach($res->Translates as $entry) {
                                 $usage = implode("; ", array_map(fn($element)=> is_array($element)?end($element):$element, $entry->Usage)); // Implode the result, which is the element itself or the last element of the array.
                                 $example = implode("<br>\n", $entry->Example);
+                                $example = preg_replace("/\b($vol)\b/i", '<span class="highlight">$1</span>', $example);
                                 echo <<<RESULT
                                 <tr id=Translates_{$cnt}>
                                     <td>{$entry->Chinese}</td>
@@ -303,6 +307,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                         $cnt = 0;
                         foreach($res->Examples as $entry) {
                             $example = implode("<br>\n", $entry[1]);
+                            $example = preg_replace("/\b($vol)\b/i", '<span class="highlight">$1</span>', $example);
                             echo <<<RESULT
                             <tr id=Examples_{$cnt}>
                                 <td>{$entry[0]}</td>
