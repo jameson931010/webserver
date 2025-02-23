@@ -149,9 +149,9 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                     </div>
                 </a>
             </div>
-            <div class="block" id="home-account">
+            <div class="block" id="home-english">
                 <a href="home-english.php">
-                    <div class="item" id="account-button">
+                    <div class="item" id="english-button">
                         <p><i class="fa-solid fa-clipboard-list"></i></p>
                     </div>
                 </a>
@@ -212,6 +212,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                             $mod->bind_param("sis", $vol, $dum, $t);
                             $mod->execute();
                             $mod->close();
+                            //echo("$t $vol");
                             #$res = addslashes(json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_QUOT | JSON_HEX_APOS));
                             #echo($res);
                             #sql_query("INSERT INTO english (vocabulary, source_id, content) VALUES (\"$vol\", 1, \'$res\';");
@@ -222,12 +223,15 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                     }
                 }
             //}
+            if(!empty($_REQUEST['vol'])) {
+                echo <<<VOL
+                <div class="block" id="Vocabulary">
+                    <h1 id="vocabulary">$vol</h1>
+                    <button onclick="remove(this)"><i class="fa-solid fa-circle-xmark"></i></button>
+                </div>
+                VOL;
+            }
             ?>
-            <div class="block" id="Vocabulary">
-                <h1 id="vocabulary"><?php echo $vol?></h1>
-                
-                <button onclick="remove(this)"><i class="fa-solid fa-circle-xmark"></i></button>
-            </div>
             <div class="block" id="Pronounciations">
                 <table>
                     <thead>
@@ -239,7 +243,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                     </thead>
                     <tbody>
                         <?php
-                        if($res->Pronounciations !== null) {
+                        if(isset($res) && isset($res->Pronounciations)) {
                             //print_r($res);
                             $cnt = 0;
                             foreach($res->Pronounciations as $entry) {
@@ -266,7 +270,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                     </thead>
                     <tbody>
                         <?php
-                        if($res->Translates !== null) {
+                        if(isset($res) && isset($res->Translates)) {
                             $cnt = 0;
                             foreach($res->Translates as $entry) {
                                 $usage = implode("; ", array_map(fn($element)=> is_array($element)?end($element):$element, $entry->Usage)); // Implode the result, which is the element itself or the last element of the array.
@@ -295,7 +299,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                     </thead>
                     <tbody>
                     <?php
-                    if($res->Examples !== null) {
+                    if(isset($res) && isset($res->Examples)) {
                         $cnt = 0;
                         foreach($res->Examples as $entry) {
                             $example = implode("<br>\n", $entry[1]);
@@ -315,7 +319,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
             </div>
             <div class="block" id="Extensions">
                 <?php
-                if($res->Extensions !== null) {
+                if(isset($res) && isset($res->Extensions)) {
                     $cnt = 0;
                     foreach($res->Extensions as $entry) {
                         echo <<<RESULT

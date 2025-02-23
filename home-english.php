@@ -26,6 +26,7 @@ require_once("connection.php");
             }
             i {
                 font-size: 10vh;
+                color: var(--dark-bg);
             }
             table {
                 border: 1px solid; border-radius: 10px;
@@ -64,15 +65,17 @@ require_once("connection.php");
                 position: fixed; top: 0px; left: 0px;
 
                 float: right;
-                display: grid; grid-template-columns: 4fr minmax(50px, 1fr) minmax(50px, 1fr);
+                display: grid; grid-template-columns: minmax(30px, 1fr) minmax(30px, 1fr) 6fr minmax(50px, 1fr) minmax(50px, 1fr);
                 height: 10%;
                 width: 100%;
                 border-radius: 5%;
                 background-color: rgba(255,255,255,0.5);
             }
             #main {
-                position: absolute; top: 0px; left: 0px; z-index: -1;
-                height: 100%;
+                /*position: absolute; top: 0px; left: 0px; z-index: -1;*/
+                position: absolute; top: 16%; left: 0px; z-index: -1;
+                /*height: 100%*/
+                min-height: 100%;
                 width: 100%;
                 background-color: var(--bg);
             }
@@ -131,6 +134,20 @@ require_once("connection.php");
     head>
     <body>
         <div class="session" id="header">
+            <div class="block" id="home">
+                <a href="index.php">
+                    <div class="item" id="home-button">
+                        <p><i class="fa-solid fa-house"></i></p>
+                    </div>
+                </a>
+            </div>
+            <div class="block" id="add-english">
+                <a href="add-english.php">
+                    <div class="item" id="english-button">
+                        <p><i class="fa-solid fa-notes-medical"></i></p>
+                    </div>
+                </a>
+            </div>
             <div class="block" id="progress">
                 <div class="item" id="p_account" style="order: 1">
                     <p>days no account</p>
@@ -159,7 +176,7 @@ require_once("connection.php");
             <div id="list">
                 <?php
                 $year = date("Y");
-                $result_list = sql_query("SELECT vocabulary FROM english ORDER BY time_added LIMIT 25;");
+                $result_list = sql_query("SELECT vocabulary FROM english ORDER BY time_added;");
                 while($row = mysqli_fetch_assoc($result_list)) {
                     echo <<<TABLE
                     <button class="vol" onclick="lookup(this)">{$row['vocabulary']}</button>

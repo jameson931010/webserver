@@ -1,6 +1,6 @@
 function remove(entry) {
-    let row = entry.closest("tr");
     let data = new FormData();
+    let row = entry.closest("tr");
     if(row === null) row = entry.closest("div");   
     if(row.id !== "Vocabulary") {
         let id=row.id.split("_");
@@ -20,7 +20,8 @@ function remove(entry) {
         console.log(JSON.stringify(res))
         if(res["success"]) {
             //history.back();
-            history.go(1);
+            //history.go(-1);
+            location.href = document.referrer;
         }
     });
 }
