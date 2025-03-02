@@ -4,7 +4,7 @@ import re
 import json
 import sys
 
-url = 'https://dictionary.cambridge.org/dictionary/english-chinese-traditional/'+sys.argv[1] 
+url = 'https://dictionary.cambridge.org/dictionary/english-chinese-traditional/'+'-'.join(sys.argv[1:])
 headers = {'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'}
 web_request = requests.get(url, headers=headers)
 #web_request = requests.get(url)
@@ -77,8 +77,11 @@ for ex in soup.find_all(['h3', 'ul'], ["dsense_h", "daccord_b"]):
 more_example = [element for element in more_example if element[1]]
 
 extend = list()                     # Extending applications
+irregular =list()                   # For highlight
 for word in soup.find_all('span', ["inf-group", "x-h", "x-p"]):
     extend.append(word.get_text())
+    if(word['class'].count("inf-group")):
+        irregular.append(word.find('b', "inf").get_text());
 
-ans = {"Pronounciations": pronounciation, "Translates": definition, "Examples": more_example, "Extensions": extend}
+ans = {"Pronounciations": pronounciation, "Translates": definition, "Examples": more_example, "Extensions": extend, "Irregular": irregular}
 print(json.dumps(ans, indent=4, ensure_ascii=False))

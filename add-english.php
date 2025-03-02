@@ -233,6 +233,9 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                     <button onclick="remove(this)"><i class="fa-solid fa-circle-xmark"></i></button>
                 </div>
                 VOL;
+                if(isset($res) && isset($res->Irregular)) {
+                    $Irregular = $res->Irregular;
+                }
             }
             ?>
             <div class="block" id="Pronounciations">
@@ -277,8 +280,10 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                             $cnt = 0;
                             foreach($res->Translates as $entry) {
                                 $usage = implode("; ", array_map(fn($element)=> is_array($element)?end($element):$element, $entry->Usage)); // Implode the result, which is the element itself or the last element of the array.
-                                $example = implode("<br>\n", $entry->Example);
-                                $example = preg_replace("/\b($vol)\b/i", '<span class="highlight">$1</span>', $example);
+                                $example = implode(" <br>\n", $entry->Example);
+                                // Replacing the vocabulary with any postfix or those matching the irregular form
+                                if(!empty($Irregular)) $example = preg_replace("/\b(".implode("|", $Irregular).")\b/i", '<span class="highlight">$1</span>', $example); // i for case insensitive, \b for whole word matching
+                                $example = preg_replace("/\b($vol\w*)\b/i", '<span class="highlight">$1</span>', $example);
                                 echo <<<RESULT
                                 <tr id=Translates_{$cnt}>
                                     <td>{$entry->Chinese}</td>
@@ -306,8 +311,10 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
                     if(isset($res) && isset($res->Examples)) {
                         $cnt = 0;
                         foreach($res->Examples as $entry) {
-                            $example = implode("<br>\n", $entry[1]);
-                            $example = preg_replace("/\b($vol)\b/i", '<span class="highlight">$1</span>', $example);
+                            $example = implode(" <br>\n", $entry[1]);
+                            // Replacing the vocabulary with any postfix or those matching the irregular form
+                            if(!empty($Irregular)) $example = preg_replace("/\b(".implode("|", $Irregular).")\b/i", '<span class="highlight">$1</span>', $example); // i for case insensitive, \b for whole word matching
+                            $example = preg_replace("/\b($vol\w*)\b/i", '<span class="highlight">$1</span>', $example);
                             echo <<<RESULT
                             <tr id=Examples_{$cnt}>
                                 <td>{$entry[0]}</td>
