@@ -4,7 +4,7 @@ import re
 import json
 import sys
 
-url = 'https://dictionary.cambridge.org/dictionary/english-chinese-traditional/'+'-'.join(sys.argv[1:])
+url = 'https://dictionary.cambridge.org/dictionary/english-chinese-traditional/'+'-'.join(sys.argv[1:]).replace("/", "-")
 headers = {'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'}
 web_request = requests.get(url, headers=headers)
 #web_request = requests.get(url)

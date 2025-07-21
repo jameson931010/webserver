@@ -6,7 +6,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Accounting</title>
+        <title>English</title>
         <script src="modification.js" async></script>
         <script src="extend.js" async></script>
         <script src="https://kit.fontawesome.com/a211388c46.js" crossorigin="anonymous" defer></script>
