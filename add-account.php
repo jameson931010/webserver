@@ -184,7 +184,13 @@ require_once("connection.php");
                     #foreach($required as $term) {
                     #    echo "<div><p>${$term}</p></div>\n";
                     #}
-                    sql_query("INSERT INTO account (day, category, store, name, money) VALUES ('$day','$category','$store','$name','$money');");
+                    $inserted = sql_query("SELECT COUNT(*) FROM account WHERE day='$day' AND category='$category' AND store='$store' AND name='$name' AND money='$money';");
+                    if(mysqli_fetch_array($inserted)[0] != 0) {
+                        echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">Repeated!!</h1></div>\n";
+                    }
+                    else {
+                        sql_query("INSERT INTO account (day, category, store, name, money) VALUES ('$day','$category','$store','$name','$money');");
+                    }
                 }
                 else {
                     echo "<div class=\"item\" id=\"warning\"><h1 style=\"color:red;font-size:5vh;\">Fill all blanks!!</h1></div>\n";
