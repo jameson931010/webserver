@@ -129,6 +129,10 @@ require_once("connection.php");
                 display: flex; flex-wrap: wrap;
                 align-items: center; justify-content: center;
             }
+            .vol {
+                flex: 0 1 calc(20% - 40px);
+                padding: 20px 0px; margin: 30px 20px;
+            }
         </style>
     </
     head>
@@ -176,7 +180,7 @@ require_once("connection.php");
             <div id="list">
                 <?php
                 $year = date("Y");
-                $result_list = sql_query("SELECT vocabulary FROM english ORDER BY time_added;");
+                $result_list = sql_query("SELECT vocabulary FROM english ORDER BY time_added DESC LIMIT 20;");
                 while($row = mysqli_fetch_assoc($result_list)) {
                     echo <<<TABLE
                     <button class="vol" onclick="lookup(this)">{$row['vocabulary']}</button>
